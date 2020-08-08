@@ -1,0 +1,27 @@
+{
+  "name": "node-unraid-api",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=12"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3",
+    "dotenv": "^8.2.0",
+    "form-data": "^3.0.0",
+    "http": "^0.0.1-security",
+    "https": "^1.0.0",
+    "yn": "^4.0.0"
+  },
+  "keywords": [
+    "unraid",
+    "api",
+    "node",
+    "javascript",
+    "rest",
+    "fetch",
+    "docker",
+    "vm"
+  ],
+  "type": "module"
+}
