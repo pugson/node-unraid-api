@@ -63,17 +63,62 @@ function getDockerContainers() {
     },
   })
     .then(async (response) => {
-      console.log("checking dockers...");
-
+      let dockers = [];
       const page = response.data;
-      const $ = cheerio.load(page);
 
-      $(".outer .appname a").each((index, container) => {
-        console.log($(container).text());
+      const $ = cheerio.load(page, {
+        xmlMode: true, // needs to be here cause unraid returns invalid html...
       });
+
+      $("tr").each((index, container) => {
+        const id = $(container).find(".outer .hand").prop("id");
+        const name = $(container).find(".appname a").text();
+        const state = $(container).find(".outer .state").text();
+        const icon = $(container).find(".hand img").prop("src");
+        const updateState =
+          $(container).find(".updatecolumn .advanced span").text().trim() === "force update"
+            ? "up-to-date"
+            : "update available";
+        const ip = getDockerIP($(container).find(`td[style="white-space:nowrap"] .docker_readmore`).html());
+        // const cpu = $(container).find('span[class^="cpu-"]').text();
+        // cpu is not updated here
+        // need to subscribe to /Docker/sub/dockerload and parse the values by id
+
+        dockers.push({
+          id,
+          name,
+          state,
+          updateState,
+          ip,
+        });
+      });
+
+      console.log(dockers);
     })
     .catch((error) => {
       console.log("Getting Docker containers failed.");
       console.log(error.message);
     });
+}
+
+function getDockerLoad() {
+  axios({
+    method: "GET",
+    url: `${ENDPOINT}/Docker/sub/dockerload`,
+    headers: {
+      Cookie: authCookie,
+    },
+  }).then(async (response) => {
+    console.log(response.data);
+  });
+}
+
+function getDockerIP(text) {
+  if (text) {
+    // lol i know...
+    const ip = text.match(/[\d]*\.[\d]*\.[\d]*\.[\d]*\:[\d]*/gm).pop();
+    return ip;
+  }
+
+  return false;
 }
